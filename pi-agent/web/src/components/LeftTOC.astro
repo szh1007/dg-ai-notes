@@ -9,7 +9,7 @@ const { currentEntry } = Astro.props;
 // 系列隔离：只展示当前章节所属系列的 TS 版目录
 const allModules = (await getAllModules(currentEntry.data.book))
   .filter(m => m.data.variant === 'ts');
-const currentBaseSlug = currentEntry.slug.replace(/\.python$/, '');
+const currentBaseSlug = currentEntry.id.replace(/\.python$/, '');
 const seriesLabel = SERIES_META[currentEntry.data.book].label;
 ---
 
@@ -28,10 +28,10 @@ const seriesLabel = SERIES_META[currentEntry.data.book].label;
   </button>
   <ul class="toc-list" id="toc-list">
     {allModules.map(m => {
-      const isCurrent = m.slug === currentBaseSlug;
+      const isCurrent = m.id === currentBaseSlug;
       return (
         <li class={`toc-item ${isCurrent ? 'is-current' : ''}`}>
-          <a href={`/modules/${m.slug}`}>
+          <a href={`/modules/${m.id}`}>
             <span class="toc-num">{m.data.module}</span>
             <span class="toc-title">{m.data.title}</span>
           </a>

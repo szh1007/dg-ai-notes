@@ -28,14 +28,14 @@ for (const file of files) {
   const content = readFileSync(join(MODULES_DIR, file), 'utf-8');
   const fm = parseFrontmatter(content);
 
-  // B4: Python variant files must declare slug ending in .python
-  // This catches silent route breakage when Astro strips dots from filename slugs.
+  // B4: Python variant files must resolve to a <base>.python route.
+  // Content Layer 的 generateId（src/content.config.ts）直接取文件名去掉扩展名，
+  // 故点号得以保留；此处校验文件命名，防止路由静默失效。
   if (file.endsWith('.python.mdx')) {
-    if (!fm.slug || !fm.slug.endsWith('.python')) {
+    const routeSlug = file.replace(/\.mdx$/, '');
+    if (!routeSlug.endsWith('.python')) {
       errors.push(
-        `[${file}] Python 变体缺少正确的 slug：frontmatter 中 slug 必须以 ".python" 结尾` +
-        `（当前值：${fm.slug ? `"${fm.slug}"` : '（未设置）'}）。` +
-        `Astro 会从文件名生成 slug，点号被剥离导致路由不匹配。`
+        `[${file}] Python 变体文件名无法产生正确的路由：期望 <base>.python，实际 "${routeSlug}"。`
       );
     }
   }
@@ -63,7 +63,7 @@ for (const file of files) {
     continue;
   }
 
-  // 双向校验
+  // 双向校验：slug 由文件名派生（content layer 的 generateId 同源）
   const mySlug = file.replace(/\.mdx$/, '');
   // Python 版的 slug 需要还原为 ts slug 用于对方 counterpart 引用
   const myBaseSlug = mySlug.replace(/\.python$/, '');

@@ -29,7 +29,7 @@ const nextPyUrl = pyUrl(next);
   {prev && (
     <a
       class="prev-card"
-      href={`/modules/${prev.slug}`}
+      href={`/modules/${prev.id}`}
       data-py-url={prevPyUrl}
     >
       <span class="label">← 上一章 · {prev.data.module}</span>
@@ -40,7 +40,7 @@ const nextPyUrl = pyUrl(next);
   {next && (
     <a
       class="next-card"
-      href={`/modules/${next.slug}`}
+      href={`/modules/${next.id}`}
       data-py-url={nextPyUrl}
     >
       <span class="label">{next.data.module} · 下一章 →</span>

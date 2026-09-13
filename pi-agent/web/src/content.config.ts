@@ -1,8 +1,18 @@
-// src/content/config.ts
+// src/content.config.ts
+// Content Layer API：Astro 6+ 移除了 legacy content collections，
+// 配置必须位于 src/ 根目录（而非 src/content/），且每个 collection 需显式声明 loader。
 import { defineCollection, z } from 'astro:content';
+import { glob } from 'astro/loaders';
+import path from 'node:path';
 
 const modules = defineCollection({
-  type: 'content',
+  // id 默认保留扩展名（ch01-overview.mdx）。剥掉扩展名后与页面路由的 slug 对齐：
+  // ch01-overview / ch01-overview.python
+  loader: glob({
+    base: './src/content/modules',
+    pattern: '**/*.{md,mdx}',
+    generateId: ({ entry }) => entry.slice(0, -path.extname(entry).length),
+  }),
   schema: z.object({
     title: z.string(),
     // M01–M10 = 源码精读篇；P01–P07 = 实战上手篇

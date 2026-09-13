@@ -51,12 +51,13 @@ const CJK_RE = /[\u4e00-\u9fa5]/g;
 const WORD_RE = /[a-zA-Z][a-zA-Z0-9_-]*/g;
 
 /**
- * 从 entry.id 解析 mdx 源文件的绝对路径。
- * Astro content collection (type:'content') 的 entry.id 是相对 content 目录的路径，
- * 形如 'ch01-overview.md' 或 'ch01-overview.python.md'。
+ * 解析 mdx 源文件的绝对路径。
+ * Content Layer 的 entry.filePath 是相对项目根的路径（形如 src/content/modules/ch01-overview.mdx），
+ * 且已剥离扩展名的 entry.id 无法反推扩展名，故回退路径补 .mdx（本 collection 全部为 .mdx）。
  */
 function resolveEntryPath(entry: ModuleEntry): string {
-  return path.resolve(process.cwd(), 'src/content/modules', entry.id);
+  if (entry.filePath) return path.resolve(process.cwd(), entry.filePath);
+  return path.resolve(process.cwd(), 'src/content/modules', `${entry.id}.mdx`);
 }
 
 /**
@@ -132,7 +133,7 @@ export function groupByChapter(entries: ModuleEntry[]): GroupedChapter[] {
 }
 
 export async function getModuleBySlug(slug: string): Promise<ModuleEntry | undefined> {
-  return (await getAllModules()).find(m => m.slug === slug);
+  return (await getAllModules()).find(m => m.id === slug);
 }
 
 /**
@@ -147,7 +148,7 @@ export async function getAdjacentModules(currentOrder: number, book: 'internals'
 }
 
 export function getVariantUrl(entry: ModuleEntry): string {
-  const base = `/modules/${entry.slug.replace(/\.python$/, '')}`;
+  const base = `/modules/${entry.id.replace(/\.python$/, '')}`;
   return entry.data.variant === 'python' ? `${base}/python` : base;
 }
 
